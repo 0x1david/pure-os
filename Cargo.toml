@@ -1,0 +1,18 @@
+[package]
+name = "pure-os"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+
+
+[[bin]]
+name = "pure-os"
+test = false
+bench = false
