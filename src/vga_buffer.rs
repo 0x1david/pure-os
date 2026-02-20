@@ -12,6 +12,12 @@ const VGA_BUFFER: *mut u8 = 0xb8000 as *mut u8;
 #[repr(transparent)]
 pub struct Volatile<T>(T);
 
+impl<T> Volatile<T> {
+    pub fn new(t: T) -> Self {
+        Self(t)
+    }
+}
+
 impl<T: Copy> Volatile<T> {
     pub fn read(&self) -> T {
         unsafe { core::ptr::read_volatile(&self.0) }
