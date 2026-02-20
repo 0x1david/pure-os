@@ -26,6 +26,10 @@ pub extern "C" fn _start() -> ! {
     println!("Hello world!");
     println!("Here comes the numbers: `{}` `{}` !", 42, 1.337);
 
+    pure_os::init();
+
+    x86_64::instructions::interrupts::int3(); // TODO: Replace with custom IDT
+
     #[cfg(test)]
     test_main();
 
