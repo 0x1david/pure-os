@@ -3,6 +3,16 @@ use lazy_static::lazy_static;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 
 lazy_static! {
+    /// InterruptDescriptorTable is used by x86 architecture to handle exceptions and HW, SW interrupts
+    /// When CPU receives an interrupt signal or encounters an exception, it uses the `interrupt
+    /// vector` as an index into the IDT
+    /// IDT can hold a maximum of 256 entries. Vectors 0-31 are rserved by Intel/AMD for specific processor
+    /// excpetions (e.g. 14 -> Page Fault)
+    ///
+    /// Size of each entry depends on the CPU's operating mode:
+    ///     Real Mode (IVT): 4 bytes (32 bits) per entry. Total table size = 1,024 bytes.
+    ///     32-bit Protected Mode: 8 bytes (64 bits) per entry. Total table size = 2,048 bytes.
+    ///     64-bit Long Mode: 16 bytes (128 bits) per entry. Total table size = 4,096 bytes.
     static ref IDT: InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
         idt.breakpoint.set_handler_fn(breakpoint_handler);
