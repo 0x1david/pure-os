@@ -27,20 +27,6 @@ pub fn init() {
     x86_64::instructions::interrupts::enable();
 }
 
-pub trait Testable {
-    fn run(&self);
-}
-impl<T> Testable for T
-where
-    T: Fn(),
-{
-    fn run(&self) {
-        serial_print!("{}... ", core::any::type_name::<T>());
-        self();
-        serial_println!("[ok]");
-    }
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum QemuExitCode {
@@ -59,14 +45,27 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
     }
 }
 
-#[cfg(test)]
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    serial_println!("[failed]\n");
-    serial_println!("Error: {\n}", info);
-    exit_qemu(QemuExitCode::Success);
+pub trait Testable {
+    fn run(&self);
+}
 
-    hlt_loop()
+impl<T> Testable for T
+where
+    T: Fn(),
+{
+    fn run(&self) {
+        serial_print!("{}... ", core::any::type_name::<T>());
+        self();
+        serial_println!("[ok]");
+    }
+}
+
+pub fn test_runner(tests: &[&dyn Testable]) {
+    serial_println!("Running {} tests", tests.len());
+    for t in tests {
+        t.run();
+    }
+    exit_qemu(QemuExitCode::Success);
 }
 
 pub fn test_panic_handler(info: &PanicInfo) -> ! {
@@ -77,12 +76,14 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
     hlt_loop()
 }
 
-pub fn test_runner(tests: &[&dyn Testable]) {
-    serial_println!("Running {} tests", tests.len());
-    for t in tests {
-        t.run();
-    }
+#[cfg(test)]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    serial_println!("[failed]\n");
+    serial_println!("Error: {\n}", info);
     exit_qemu(QemuExitCode::Success);
+
+    hlt_loop()
 }
 
 #[cfg(test)]
