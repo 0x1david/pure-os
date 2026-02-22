@@ -11,7 +11,7 @@ use pure_os::println;
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    pure_os::hlt_loop()
 }
 
 #[cfg(test)]
@@ -28,14 +28,10 @@ pub extern "C" fn _start() -> ! {
 
     pure_os::init();
 
-    unsafe { *(0xdeadbeef as *mut u8) = 42 }
-
-    x86_64::instructions::interrupts::int3(); // TODO: Replace with custom IDT
-
     #[cfg(test)]
     test_main();
 
-    loop {}
+    pure_os::hlt_loop()
 }
 
 #[test_case]
