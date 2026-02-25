@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bootloader = "0.9.34"
+bootloader = { version = "0.9.34", features = ["map_physical_memory"] }
 spin = "0.10.0"
 lock_api = "=0.4.10"
 x86_64 = "0.15.4"
